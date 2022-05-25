@@ -29,13 +29,14 @@ class SignUpView(View):
                 return JsonResponse({"message" : "INVALID_PASSWORD"}, status=400)
 
             hashed_password = bcrypt.hashpw(password.encode("UTF-8"), bcrypt.gensalt()).decode("UTF-8")
-            
+
             User.objects.create(
                 name            = input_data['name'],
                 email           = email,
                 password        = hashed_password,
                 mobile_number   = input_data['mobile_number'],
-                # email_subscribe = input_data['email_subscribe']
+                address         = input_data['address'],
+                email_subscribe = input_data['email_subscribe']
             ) 
             return JsonResponse({"messsage" : "SUCCESS"}, status=201)
 
