@@ -23,7 +23,7 @@ class SubCategory(models.Model):
         
 class Product(models.Model):
     sub_category       = models.ForeignKey('SubCategory', on_delete=models.CASCADE)
-    product_name       = models.CharField(max_length=200)
+    name       = models.CharField(max_length=200)
     price              = models.CharField(max_length=30)
     fit_materials_care = JSONField()
     is_new             = models.BooleanField(default=False)
@@ -70,12 +70,12 @@ class Option(models.Model):
 
 class Activity(models.Model):
     activity_name = models.CharField(max_length=30)
-    product_name  = models.ManyToManyField('Product', through="Product_Activity")
+    products  = models.ManyToManyField('Product', through="ProductActivity")
     
     class Meta:
         db_table = 'activities'
 
-class Product_Activity(models.Model):
+class ProductActivity(models.Model):
     activity = models.ForeignKey('Activity', on_delete=models.CASCADE)
     product  = models.ForeignKey('Product', on_delete=models.CASCADE)
     

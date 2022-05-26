@@ -29,4 +29,8 @@ class Cart(TimeStampModel):
     quantity  = models.IntegerField()
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'product'], name = 
+            'name of constraint')
+        ]
         db_table = 'carts'
