@@ -5,6 +5,7 @@ import json, re, bcrypt, jwt
 from django.http  import JsonResponse
 from django.views import View
 from django.conf  import settings
+from utils        import login_decorator
 
 from .models      import User
 
@@ -42,6 +43,7 @@ class SignUpView(View):
             return JsonResponse({"message" : "KeyError"}, status=400)
     
 class SignInView(View):
+    @login_decorator
     def post(self,request):
         try:
             input_data = json.loads(request.body)
