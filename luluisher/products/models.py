@@ -1,6 +1,5 @@
 from tkinter import CASCADE
 from django.db import models
-from django.forms import JSONField
 
 class Menu(models.Model):
     name = models.CharField(max_length=30)
@@ -26,7 +25,7 @@ class Product(models.Model):
     sub_category       = models.ForeignKey('SubCategory', on_delete=models.CASCADE)
     name               = models.CharField(max_length=200)
     price              = models.CharField(max_length=30)
-    fit_materials_care = JSONField()
+    fit_materials_care = models.JSONField(default=dict)
     is_new             = models.BooleanField(default=False)
     is_bestseller      = models.BooleanField(default=False)
     summer_clothes     = models.BooleanField(default=False)
@@ -35,13 +34,13 @@ class Product(models.Model):
         db_table = 'products'
 
 class OptionColor(models.Model):
-    description = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
 
     class Meta:
         db_table = 'options_color'
 
 class OptionSize(models.Model):
-    description = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
 
     class Meta:
         db_table = 'options_size'
