@@ -37,13 +37,13 @@ class OptionColor(models.Model):
     name = models.CharField(max_length=100)
 
     class Meta:
-        db_table = 'options_color'
+        db_table = 'option_colors'
 
 class OptionSize(models.Model):
     name = models.CharField(max_length=100)
 
     class Meta:
-        db_table = 'options_size'
+        db_table = 'option_sizes'
 
 class ProductOption(models.Model): 
     product      = models.ForeignKey('Product', on_delete=models.CASCADE)
