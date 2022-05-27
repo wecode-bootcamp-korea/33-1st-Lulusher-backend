@@ -1,3 +1,4 @@
+from tkinter import CASCADE
 from django.db import models
 from django.forms import JSONField
 
@@ -23,7 +24,7 @@ class SubCategory(models.Model):
         
 class Product(models.Model):
     sub_category       = models.ForeignKey('SubCategory', on_delete=models.CASCADE)
-    name       = models.CharField(max_length=200)
+    name               = models.CharField(max_length=200)
     price              = models.CharField(max_length=30)
     fit_materials_care = JSONField()
     is_new             = models.BooleanField(default=False)
@@ -33,12 +34,26 @@ class Product(models.Model):
     class Meta:
         db_table = 'products'
 
-class ProductOption(models.Model):
+class OptionColor(models.Model):
+    description = models.CharField(max_length=100)
+
+    class Meta:
+        db_table = 'options_color'
+
+class OptionSize(models.Model):
+    description = models.CharField(max_length=100)
+
+    class Meta:
+        db_table = 'options_size'
+
+class ProductOption(models.Model): 
     product      = models.ForeignKey('Product', on_delete=models.CASCADE)
+    color        = models.ForeignKey('OptionColor', on_delete=models.CASCADE)
+    size         = models.ForeignKey('OptionSize', on_delete=models.CASCADE)
     stock        = models.CharField(max_length=30)
     option_price = models.CharField(max_length=30)
     
-    class Meta:
+    class Meta: 
         db_table = 'product_options'
         
 class ProductOptionImage(models.Model):
@@ -48,29 +63,9 @@ class ProductOptionImage(models.Model):
     class Meta:
         db_table = 'product_options_images'
 
-class OptionGroup(models.Model):
-    product_option = models.ForeignKey('ProductOption', on_delete=models.CASCADE)
-    option         = models.ForeignKey('option', on_delete=models.CASCADE)
-    
-    class Meta:
-        db_table = 'option_groups'
-
-class OptionType(models.Model):
-    name          = models.CharField(max_length=30)
-    
-    class Meta:
-        db_table = 'option_types'
-    
-class Option(models.Model):
-    description = models.CharField(max_length=100)
-    option_type = models.ForeignKey('OptionType', on_delete=models.CASCADE)
-    
-    class Meta:
-        db_table = 'options'
-
-class Activity(models.Model):
+class Activity(models.Model): 
     activity_name = models.CharField(max_length=30)
-    products  = models.ManyToManyField('Product', through="ProductActivity")
+    products      = models.ManyToManyField('Product', through="ProductActivity")
     
     class Meta:
         db_table = 'activities'
