@@ -6,7 +6,10 @@ from products.models import Menu, Product, OptionSize, OptionColor, ProductOptio
 
 class productListView(View):
     def get(self, request):
-        try:
+        try: 
+            offset         = int(request.GET.get('offset', 0))
+            limit          = int(request.GET.get('limit', 9))
+            menu           = request.GET.get('menu', None)
             main_category  = request.GET.get('main_category', None)
             sub_category   = request.GET.get('sub_category', None)
             option_color   = request.GET.getlist('option_color', None)
@@ -14,34 +17,41 @@ class productListView(View):
             is_new         = request.GET.get('is_new', None)
             is_bestseller  = request.GET.get('is_bestseller', None)
             summer_clothes = request.GET.get('summer_clothes', None)
+            activity       = request.GET.get('activity', None)
             
             q = Q()
-
+            
+            if menu:
+                q &= Q(sub_category__main_category__menu__name=menu)
+                
             if main_category:
-                q &= Q(sub_category__main_category__in=main_category)
+                q &= Q(sub_category__main_category__name=main_category)
                 
             if sub_category:
-                q &= Q(sub_category__in=sub_category)
+                q &= Q(sub_category__name=sub_category)
 
             if option_color:
-                q &= Q(productoption__color__in=option_color) 
+                q &= Q(productoption__color__name__in=option_color) 
                 
             if option_size:
-                q &= Q(productoption__size__in=option_size)
+                q &= Q(productoption__size__name__in=option_size)
 
             if is_new:
-                q &= Q(is_new__in=is_new)
+                q &= Q(is_new__name=is_new)
                 
             if is_bestseller:
-                q &= Q(is_bestseller__in=is_bestseller)
+                q &= Q(is_bestseller__name=is_bestseller)
 
             if summer_clothes:
-                q &= Q(summer_clothes__in=summer_clothes)
-                
-            products = Product.objects.filter(q)
+                q &= Q(summer_clothes__name=summer_clothes)
 
-            if (sub_category or option_color or option_size or is_new or is_bestseller or summer_clothes) == None:
-                products = Product.objects.all()
+            if activity:
+                q &= Q(activity__activity_name=activity)
+                
+            products = Product.objects.filter(q)[offset:limit]
+
+            if (menu or main_category or sub_category or option_color or option_size or is_new or is_bestseller or summer_clothes or activity) == None:
+                products = Product.objects.all()[offset:limit]
                 
             product_list = [{
                 'product_id'         : product.id,
