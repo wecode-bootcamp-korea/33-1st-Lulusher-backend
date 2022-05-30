@@ -1,7 +1,7 @@
 from tkinter      import CASCADE
 from django.db    import models
 
-from users.models import TimeStampModel
+from core import TimeStampModel
 
 class Menu(models.Model):
     name = models.CharField(max_length=30)
