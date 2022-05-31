@@ -15,4 +15,3 @@ class Cart(TimeStampModel):
             'name of constraint')
         ]
         db_table = 'carts' 
-        
