@@ -86,3 +86,4 @@ class Review(TimeStampModel):
 
     class Meta:
         db_table = 'reviews'
+
