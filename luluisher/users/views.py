@@ -7,8 +7,6 @@ from django.views           import View
 from django.conf            import settings
 
 from .models         import User
-from utils           import login_decorator
-from products.models import Product
 
 class SignUpView(View):
     def post(self, request): 
