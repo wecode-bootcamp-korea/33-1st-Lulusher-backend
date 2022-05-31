@@ -43,7 +43,7 @@ class SignUpView(View):
             return JsonResponse({"messsage" : "SUCCESS"}, status=201)
 
         except KeyError:
-            return JsonResponse({"message" : "KeyError"}, status=400)
+            return JsonResponse({"message" : "Key_Error"}, status=400)
     
 class SignInView(View):
     def post(self,request):
@@ -56,13 +56,13 @@ class SignInView(View):
 
             if bcrypt.checkpw(password.encode('UTF-8'), user.password.encode('UTF-8)')):
                 token = jwt.encode({'user_id' : user.id}, settings.SECRET_KEY, settings.ALGORITHM)
-                return JsonResponse({'token' : token}, status=200)
+                return JsonResponse({'message' : "success", 'token' : token}, status=200)
 
         except KeyError:
             return JsonResponse({"message" : "KEY_ERROR"}, status=400)
 
         except User.DoesNotExist:
-            return JsonResponse({'Message': 'Invalid Email'}, status = 400)
+            return JsonResponse({'message': 'Invalid Email'}, status = 400)
 
 # 담기
 class CartView(View):
@@ -72,23 +72,23 @@ class CartView(View):
             input_data = json.loads(request.body)
             user_id    = request.user
             product_id = input_data['product_id']
-            image_url   = input_data['image_url']
-            quantity   = input_data['qunatity']
+            image_url  = input_data['image_url']
+            quantity   = input_data['quantity']
         
             if not Product.objects.filter(id=product_id).exists(): 
-                return JsonResponse({'messag' : 'PRODUCT_DOES_NOT_EXIST'}, status=400)
+                return JsonResponse({'message' : 'PRODUCT_DOES_NOT_EXIST'}, status=400)
             if quantity <= 0:
                 return JsonResponse({'message' : 'QUANTITY_ERROR'}, status=400)
         
             cart = Cart.objects.get_or_create(
-                user       = user_id,
                 product_id = product_id,
-                image_url   = image_url
+                image_url  = image_url,
+                user_id    = user_id
         )
 
             cart.quantity += quantity
             cart.save()
-            return JsonResponse({'message' : 'SUCESS'}, stauts=201)
+            return JsonResponse({'message' : 'SUCCESS'}, stauts=201)
 
         except Cart.DoesNotExist:
             return JsonResponse({'message' : 'INVALID_CART'}, status=400)
@@ -100,8 +100,8 @@ class CartView(View):
 # 조회
 @login_decorator
 def get(self, request):
-    user = request.user
 
+    user = request.user
     if not Cart.objects.filter(user=user).exists():
         return JsonResponse({'message' : 'USER_CART_DOES_NOT_EXIST'}, status=400)
 
@@ -109,7 +109,6 @@ def get(self, request):
 
     result = [{
         'cart_id' : cart.id,
-        'name'    : cart.product.name,
         'quantity': cart.quantity,
         'price'   : cart.product.price,
         'image'   : cart.product_options_images_set.get(is_thumbnail=True).image_url
@@ -117,21 +116,20 @@ def get(self, request):
     return JsonResponse({'result' : result}, status=200)
 
 # 수정 
-@login_decorator
+# @login_decorator
 def patch(self, request):
     try:
         input_data = json.loads(request.body)
-        user       = request.user
         cart_id    = request.GET.get('id')
         quantity   = input_data['quantity']
 
-        if not Cart.objects.filter(id=cart_id, user=user).exists():
+        if not Cart.objects.filter(id=cart_id).exists():
             return JsonResponse({'message' : 'INVALID_CART_ID'}, status=404)
         
         if quantity <= 0:
             return JsonResponse({'message' : 'QUANTITY_ERROR'}, status=400)
         
-        cart = Cart.objects.get(id=cart_id, user=user)
+        cart = Cart.objects.get(id=cart_id)
 
         cart.quantity = input_data['qunatity']
         cart.save()
@@ -145,8 +143,7 @@ def patch(self, request):
         return JsonResponse({'message' : 'KEY_ERROR'}, status=400)
 
 # 장바구니 삭제 
-
-@login_decorator
+# @login_decorator
 def delete(self,request):
     try:
         user = request.user
