@@ -1,8 +1,13 @@
+import json
+from json.decoder import JSONDecodeError
+
 from django.http import JsonResponse
 from django.views import View
 from django.db.models import Q
 
-from products.models import Menu, Product, OptionSize, OptionColor, ProductOption, ProductOptionImage, Activity
+from utils import login_decorator
+from users.models import User
+from products.models import Menu, Product, OptionSize, OptionColor, ProductOption, ProductOptionImage, Activity, Review
 
 class productListView(View):
     def get(self, request):
@@ -93,3 +98,87 @@ class MenuListView(View) :
             } for menu in Menu.objects.all().order_by('id')]
         
         return JsonResponse({'category_list':category_list}, status = 200)
+    
+class ReviewView(View):
+    @login_decorator
+    def post(self, request, product_id):
+        try:
+            data = json.loads(request.body)
+            user = request.user
+
+            content = data.get('content')
+            rating  = data.get('rating')
+            product = data.get('product_id')
+
+            product = Product.objects.get(id = product_id)
+            
+            Review.objects.create(
+                content = content,
+                user    = user,
+                rating  = rating,
+                product = product,
+            )
+
+            return JsonResponse({'Message' : 'SUCCESS'}, status = 200)
+
+        except KeyError: 
+            return JsonResponse({'Message' : 'KEY_ERROR'}, status = 400)
+
+        except Product.DoesNotExist:
+            return JsonResponse({'Message' : 'PRODUCT_DOES_NOT_EXIST'}, status = 400)
+
+    def get(self, request, product_id):
+        try:
+            review_list = [{
+                "id"       : review.id,
+                "username" : User.objects.get(id = review.user_id).name,
+                "content"  : review.content,
+                "rating"   : review.rating,
+                "create_at": review.created_at,
+                } for review in Review.objects.filter(product_id = product_id)
+            ]
+            return JsonResponse({'data' : review_list}, status = 200)
+        
+        except KeyError: 
+            return JsonResponse({'Message' : 'KEY_ERROR'}, status = 400)
+
+        except Product.DoesNotExist:
+            return JsonResponse({'Message' : 'PRODUCT_DOES_NOT_EXIST'}, status = 400)
+        
+    @login_decorator
+    def delete(self, request, product_id, review_id):
+        if not Product.objects.filter(id = product_id).exists():
+            return JsonResponse({'Message' : 'PRODUCT_DOES_NOT_EXIST'}, status = 404)
+        
+        if not Review.objects.filter(id = review_id).exists():
+            return JsonResponse({'Message' : 'REVIEW_DOES_NOT_EXIST'}, status = 404)
+        
+        review = Review.objects.get(id = review_id)
+        
+        if review.user != request.user:
+            return JsonResponse({'Message' : 'Invalid_User'}, status = 401)
+
+        review.delete()
+        
+        return JsonResponse({'Message' : 'SUCCESS'}, status = 200)
+        
+    @login_decorator
+    def patch(self, request, product_id, review_id):
+        if not Product.objects.filter(id = product_id).exists():
+            return JsonResponse({'Message' : 'PRODUCT_DOES_NOT_EXIST'}, status = 404)
+        
+        if not Review.objects.filter(id = review_id).exists():
+            return JsonResponse({'Message' : 'REVIEW_DOES_NOT_EXIST'}, status = 404)
+        
+        review = Review.objects.get(id = review_id)
+            
+        if review.user != request.user:
+            return JsonResponse({'Message' : 'Invalid_User'}, status = 401)
+        
+        data = json.loads(request.body)
+        
+        review.rating  = data['rating']
+        review.content = data['content']
+        review.save()
+        
+        return JsonResponse({'Message' : 'SUCCESS'}, status = 200)

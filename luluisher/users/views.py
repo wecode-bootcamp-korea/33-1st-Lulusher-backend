@@ -36,11 +36,11 @@ class SignUpView(View):
                 address         = input_data['address'],
                 email_subscribe = input_data['email_subscribe']
             ) 
-            return JsonResponse({"messsage" : "SUCCESS"}, status=201)
+            return JsonResponse({"message" : "SUCCESS"}, status=201)
 
         except KeyError:
             return JsonResponse({"message" : "KeyError"}, status=400)
-    
+        
 class SignInView(View):
     def post(self,request):
         try:
@@ -51,11 +51,11 @@ class SignInView(View):
             user     = User.objects.get(email = email)
 
             if bcrypt.checkpw(password.encode('UTF-8'), user.password.encode('UTF-8)')):
-                token = jwt.encode({'user_id' : user.id}, settings.SECRET_KEY, settings.ALGORITHM)
-                return JsonResponse({'token' : token}, status=200)
+                token = jwt.encode({'id' : user.id}, settings.SECRET_KEY, settings.ALGORITHM)
+                return JsonResponse({"message": "success",'token' : token}, status=200)
 
         except KeyError:
             return JsonResponse({"message" : "KEY_ERROR"}, status=400)
 
         except User.DoesNotExist:
-            return JsonResponse({'Message': 'Invalid Email'}, status = 400)
+            return JsonResponse({"message": "Invalid Email"}, status = 400)
