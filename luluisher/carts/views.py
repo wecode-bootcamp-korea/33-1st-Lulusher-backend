@@ -35,13 +35,13 @@ class CartView(View):
 
             cart, created = Cart.objects.get_or_create(
                 product_option_id = product_option.id,
-                user_id           = user_id,
+                user           = user_id,
                 defaults          = {'quantity' : quantity},
         )
             if not created:
                 cart.quantity += quantity
                 cart.save()
-            return JsonResponse({'message' : 'SUCCESS'}, stauts=201)
+            return JsonResponse({'message' : 'SUCCESS'}, status=201)
 
         except Cart.DoesNotExist:
             return JsonResponse({'message' : 'INVALID_CART'}, status=400)
@@ -69,7 +69,7 @@ def get(self, request):
     return JsonResponse({'results' : results}, status=200)
 
 # 수정 
-# @login_decorator
+@login_decorator
 def patch(self, request):
     try:
         data = json.loads(request.body)
@@ -96,7 +96,7 @@ def patch(self, request):
         return JsonResponse({'message' : 'KEY_ERROR'}, status=400)
 
 # 장바구니 삭제 
-# @login_decorator
+@login_decorator
 def delete(self,request):
     try:
         user = request.user
