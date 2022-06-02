@@ -1,9 +1,6 @@
 from django.db       import models
-from products.models import Product
 
 from core           import TimeStampModel
-
-# Create your models here.
 
 class User(TimeStampModel):
     name            = models.CharField(max_length=100)
@@ -15,16 +12,3 @@ class User(TimeStampModel):
 
     class Meta: 
         db_table = "users"
-
-class Cart(TimeStampModel):
-    user      = models.ForeignKey(User, on_delete=models.CASCADE)
-    product   = models.ForeignKey(Product, on_delete=models.CASCADE)
-    image_url = models.URLField(max_length=1000)
-    quantity  = models.IntegerField()
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['user', 'product'], name = 
-            'name of constraint')
-        ]
-        db_table = 'carts'
