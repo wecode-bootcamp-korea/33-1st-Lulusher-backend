@@ -17,14 +17,13 @@ class CartView(View):
             user_id    = request.user
             product_id = data['product_id']
             quantity   = data['quantity']
-            color_id   = data['color']
-            size_id    = data['size']
-
+            color_id   = data['color_id']
+            size_id    = data['size_id']
+        
             if not Product.objects.filter(id=product_id).exists(): 
                 return JsonResponse({'message' : 'PRODUCT_DOES_NOT_EXIST'}, status=400)
             if quantity < 0:
                 return JsonResponse({'message' : 'QUANTITY_ERROR'}, status=400)
-
             product_option = ProductOption.objects.get(
                 product_id = product_id,
                 color_id   = color_id,

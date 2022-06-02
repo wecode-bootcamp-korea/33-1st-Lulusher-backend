@@ -1,12 +1,12 @@
-# Create your views here.
-
 import json, re, bcrypt, jwt
+from json import JSONDecodeError
 
-from django.http  import JsonResponse
-from django.views import View
-from django.conf  import settings
+from django.http            import JsonResponse
+from django.core.exceptions import MultipleObjectsReturned
+from django.views           import View
+from django.conf            import settings
 
-from .models      import User
+from .models         import User
 
 class SignUpView(View):
     def post(self, request): 
@@ -39,11 +39,25 @@ class SignUpView(View):
             return JsonResponse({"messsage" : "SUCCESS"}, status=201)
 
         except KeyError:
-            return JsonResponse({"message" : "KeyError"}, status=400)
+            return JsonResponse({"message" : "Key_Error"}, status=400)
     
 class SignInView(View):
     def post(self, request):
         try:
+<<<<<<< HEAD
+            input_data = json.loads(request.body)
+
+            email    = input_data['email']
+            password = input_data['password']
+            user     = User.objects.get(email = email)
+
+            if bcrypt.checkpw(password.encode('UTF-8'), user.password.encode('UTF-8)')):
+                token = jwt.encode({'id' : user.id}, settings.SECRET_KEY, settings.ALGORITHM)
+                return JsonResponse({'message' : "success", 'token' : token}, status=200)
+
+        except KeyError:
+            return JsonResponse({"message" : "KEY_ERROR"}, status=400)
+=======
             data = json.loads(request.body) 
             
             email    = data['email']
@@ -53,6 +67,7 @@ class SignInView(View):
             
             if not bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
                 return JsonResponse({'Message': 'Invalid Password'}, status = 401)
+>>>>>>> main
 
             access_token = jwt.encode({'id' : user.id}, settings.SECRET_KEY, settings.ALGORITHM)
             
@@ -65,4 +80,4 @@ class SignInView(View):
             return JsonResponse({'Message': 'KEY_ERROR'}, status = 400)
         
         except User.DoesNotExist:
-            return JsonResponse({'Message': 'Invalid Email'}, status = 400)
+            return JsonResponse({'message': 'Invalid Email'}, status = 400)

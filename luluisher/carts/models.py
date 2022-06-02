@@ -1,5 +1,4 @@
 from django.db import models
-
 from core      import TimeStampModel
 
 from users.models    import User
