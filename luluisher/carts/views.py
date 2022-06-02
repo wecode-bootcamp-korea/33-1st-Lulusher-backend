@@ -35,7 +35,7 @@ class CartView(View):
 
             cart, created = Cart.objects.get_or_create(
                 product_option_id = product_option.id,
-                user           = user_id,
+                user              = user_id,
                 defaults          = {'quantity' : quantity},
         )
             if not created:
@@ -45,73 +45,56 @@ class CartView(View):
 
         except Cart.DoesNotExist:
             return JsonResponse({'message' : 'INVALID_CART'}, status=400)
-        # excpet JSONDecodeError:
-        #     return JsonResponse({'message' : 'JSON_DECODE_ERROR'}, status=400)
         except KeyError:
             return JsonResponse({'message' : 'KEY_ERROR'}, status=400)
 
-# 조회
-@login_decorator
-def get(self, request):
+    # 조회
+    @login_decorator
+    def get(self, request):
 
-    user = request.user
-    if not Cart.objects.filter(user=user).exists():
-        return JsonResponse({'message' : 'USER_CART_DOES_NOT_EXIST'}, status=400)
-
-    carts = Cart.objects.filter(user=user)
-
-    results = [{
-        'cart_id' : cart.id,
-        'quantity': cart.quantity,
-        'price'   : cart.product.price,
-        'image'   : cart.product_options_images_set.get(is_thumbnail=True).image_url
-    } for cart in carts]
-    return JsonResponse({'results' : results}, status=200)
-
-# 수정 
-@login_decorator
-def patch(self, request):
-    try:
-        data = json.loads(request.body)
-        cart_id    = request.GET.get('id')
-        quantity   = data['quantity']
-
-        if not Cart.objects.filter(id=cart_id).exists():
-            return JsonResponse({'message' : 'INVALID_CART_ID'}, status=404)
-        
-        if quantity < 0:
-            return JsonResponse({'message' : 'QUANTITY_ERROR'}, status=400)
-        
-        cart = Cart.objects.get(id=cart_id)
-
-        cart.quantity = data['quantity']
-        cart.save()
-        return JsonResponse({'quantity' : cart.quantity}, status=200)
-
-    except MultipleObjectsReturned:
-        return JsonResponse({'message' : 'MULTIPLE_OBJECTS_RETURNED'}, status=400)
-    except JSONDecodeError:
-        return JsonResponse({'message' : 'JSON_DECODE_ERROR'}, status=400)
-    except KeyError: 
-        return JsonResponse({'message' : 'KEY_ERROR'}, status=400)
-
-# 장바구니 삭제 
-@login_decorator
-def delete(self,request):
-    try:
         user = request.user
-        cart_id = request.GET.get('id')
+        if not Cart.objects.filter(user=user).exists():
+            return JsonResponse({'message' : 'USER_CART_DOES_NOT_EXIST'}, status=400)
 
-        if not Cart.objects.filter(id=cart_id, user=user).exists():
-            return JsonResponse({'message' : 'INVALID_CART_ID'}, status=404)
+        carts = Cart.objects.filter(user=user)
+
+        results = [{
+            'cart_id' : cart.id,
+            'quantity': cart.quantity,
+            'price'   : cart.product_option.product.price,
+            'image'   : [image.image_url for image in cart.product_option.productoptionimage_set.all()]
+            } for cart in carts]
+        return JsonResponse({'results' : results}, status=200)
+
+    # 수정 
+    @login_decorator
+    def patch(self, request, cart_id):
+        try:
+            data = json.loads(request.body)
+            quantity   = data['quantity']
+
+            if not Cart.objects.filter(id=cart_id).exists():
+                return JsonResponse({'message' : 'INVALID_CART_ID'}, status=404)
+            
+            if quantity < 1:
+                return JsonResponse({'message' : 'QUANTITY_ERROR'}, status=400)
+            
+            cart = Cart.objects.get(id=cart_id)
+
+            cart.quantity = data['quantity']
+            cart.save()
+            return JsonResponse({'quantity' : cart.quantity}, status=200)
+
+        except MultipleObjectsReturned:
+            return JsonResponse({'message' : 'MULTIPLE_OBJECTS_RETURNED'}, status=400)
+        except JSONDecodeError:
+            return JsonResponse({'message' : 'JSON_DECODE_ERROR'}, status=400)
+        except KeyError: 
+            return JsonResponse({'message' : 'KEY_ERROR'}, status=400)
+
+    # 장바구니 삭제 
+    @login_decorator
+    def delete(self,request,cart_id):
         
-        cart = Cart.objects.get(id=cart_id, user=user)
-
-        cart.delete()
-        return JsonResponse({'message' : 'DELETED'}, status=200)
-
-    except MultipleObjectsReturned:
-        return JsonResponse({'message' : 'MULTIPLE_OBJECTS_RETURNED'}, status=400)
-    except ValueError:
-        return JsonResponse({'message' : 'VALUE_ERROR'}, status=400)
-
+        Cart.objects.filter(id=cart_id, user_id = request.user.id).delete()
+        return JsonResponse({'Message' : 'NO_CONTENT'}, status = 200)
