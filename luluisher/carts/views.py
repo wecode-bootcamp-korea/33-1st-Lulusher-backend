@@ -60,12 +60,12 @@ class CartView(View):
 
         results = [{
             'cart_id'    : cart.id,
-            'name'       : cart.name,
-            'color'      : cart.color,
-            'size'       : cart.size,
+            'name'       : cart.product_option.product.name,
+            'color'      : cart.product_option.color.name,
+            'size'       : cart.product_option.size.name,
             'quantity'   : cart.quantity,
             'price'      : cart.product_option.product.price,
-            'total_price': int('price'),
+            'total_price': int(cart.quantity) * int(cart.product_option.product.price),
             'image'      : [image.image_url for image in cart.product_option.productoptionimage_set.all()]
             } for cart in carts]
         return JsonResponse({'results' : results}, status=200)
