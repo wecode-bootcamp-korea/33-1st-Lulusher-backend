@@ -59,10 +59,14 @@ class CartView(View):
         carts = Cart.objects.filter(user=user)
 
         results = [{
-            'cart_id' : cart.id,
-            'quantity': cart.quantity,
-            'price'   : cart.product_option.product.price,
-            'image'   : [image.image_url for image in cart.product_option.productoptionimage_set.all()]
+            'cart_id'    : cart.id,
+            'name'       : cart.name,
+            'color'      : cart.color,
+            'size'       : cart.size,
+            'quantity'   : cart.quantity,
+            'price'      : cart.product_option.product.price,
+            'total_price': int('price'),
+            'image'      : [image.image_url for image in cart.product_option.productoptionimage_set.all()]
             } for cart in carts]
         return JsonResponse({'results' : results}, status=200)
 
