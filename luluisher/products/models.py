@@ -1,4 +1,3 @@
-from tkinter      import CASCADE
 from django.db    import models
 
 from core import TimeStampModel
@@ -26,7 +25,7 @@ class SubCategory(models.Model):
 class Product(TimeStampModel):
     sub_category       = models.ForeignKey('SubCategory', on_delete=models.CASCADE)
     name               = models.CharField(max_length=200)
-    price              = models.CharField(max_length=30)
+    price              = models.IntegerField(default=0)
     fit_materials_care = models.JSONField(default=dict)
     is_new             = models.BooleanField(default=False)
     is_bestseller      = models.BooleanField(default=False)
