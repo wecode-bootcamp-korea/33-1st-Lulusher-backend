@@ -23,14 +23,14 @@ FrontEnd - HTML/CSS, JavaScript, React.js , React-Router, React-Router-DOM, Sass
 BackEnd - Python, Django, MySQL, Bcrypt, pyJWT
 
 ## 프론트 엔드 업무 담당
-이해용 - Navbar, Main
-김형겸 - 물품 리스트, footer
-안현정 - 물품 세부(+리뷰)
-장수연 - 회원가입/로그인, 장바구니
+이해용 - Navbar, Main </br>
+김형겸 - 물품 리스트, footer </br>
+안현정 - 물품 세부(+리뷰) </br>
+장수연 - 회원가입/로그인, 장바구니 </br>
 
 ## 백엔드 업무 담당
-이예은 - DB 모델링, 회원가입/로그인 API, 상품상세페이지 API, 장바구니 API
-최혜인 - DB 모델링, 상품상세페이지 API, 상품리스트 API, 장바구니 API, 리뷰 API
+이예은 - DB 모델링, 회원가입/로그인 API, 상품상세페이지 API, 장바구니 API </br>
+최혜인 - DB 모델링, 상품상세페이지 API, 상품리스트 API, 장바구니 API, 리뷰 API </br>
 
 
 #### Users app
